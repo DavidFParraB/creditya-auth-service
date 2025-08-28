@@ -2,6 +2,7 @@ package co.credit.app.r2dbc;
 
 import org.reactivecommons.utils.ObjectMapper;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.reactive.TransactionalOperator;
 
 import co.credit.app.model.user.User;
 import co.credit.app.model.user.gateways.UserRepository;
@@ -14,14 +15,20 @@ import reactor.core.publisher.Mono;
 public class MyReactiveRepositoryAdapter
     extends ReactiveAdapterOperations<User, UserEntity, Long, MyReactiveRepository>
     implements UserRepository {
-  public MyReactiveRepositoryAdapter(MyReactiveRepository repository, ObjectMapper mapper) {
+
+  private final TransactionalOperator transactionalOperator;
+
+  public MyReactiveRepositoryAdapter(MyReactiveRepository repository, ObjectMapper mapper,
+      TransactionalOperator transactionalOperator) {
     /**
      * Could be use mapper.mapBuilder if your domain model implement builder pattern
      * super(repository, mapper, d ->
-     * mapper.mapBuilder(d,ObjectModel.ObjectModelBuilder.class).build()); Or using mapper.map with
+     * mapper.mapBuilder(d,ObjectModel.ObjectModelBuilder.class).build()); Or using
+     * mapper.map with
      * the class of the object model
      */
     super(repository, mapper, d -> mapper.map(d, User.class));
+    this.transactionalOperator = transactionalOperator;
   }
 
   @Override
@@ -38,15 +45,17 @@ public class MyReactiveRepositoryAdapter
   public Mono<User> updateUser(User user) {
     return repository.save(toData(user)).map(this::toEntity);
   }
+
   @Override
   public Mono<User> findByDocument(String document) {
     return repository.findByDocument(document).map(this::toEntity);
   }
+
   @Override
   public Mono<User> findByEmail(String email) {
     return repository.findByEmail(email).map(this::toEntity);
   }
-  
+
   @Override
   public Flux<User> getAllUsers() {
     return repository.findAll().map(this::toEntity);
@@ -54,6 +63,11 @@ public class MyReactiveRepositoryAdapter
 
   @Override
   public Mono<Void> saveUser(User user) {
-    return repository.save(toData(user)).then();
+    return repository.save(toData(user))
+        .flatMap(savedUser -> {
+          return Mono.just(savedUser);
+        })
+        .as(transactionalOperator::transactional)
+        .then();
   }
 }

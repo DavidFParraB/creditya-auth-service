@@ -26,16 +26,16 @@ public class UserDTO {
     @Email(message = "El email no es válido")
     private String email;
     @NotNull(message = "El documento es obligatorio")
-    @Size(min = 10, max = 15, message = "El documento debe tener entre 10 y 15 caracteres")
-    @Pattern(regexp = "^[0-9]{10,15}$", message = "El documento no es válido")
+    @Size(min = 7, max = 15, message = "El documento debe tener entre 7 y 15 caracteres")
+    @Pattern(regexp = "^[0-9]{7,15}$", message = "El documento no es válido")
     private String document;
     @NotNull(message = "El teléfono es obligatorio")
-    @Size(min = 10, max = 20, message = "El teléfono debe tener entre 10 y 20 caracteres")
-    @Pattern(regexp = "^[0-9]{10,20}$", message = "El teléfono no es válido")
+    @Size(min = 7, max = 12, message = "El teléfono debe tener entre 7 y 12 caracteres")
+    @Pattern(regexp = "^[0-9]{7,12}$", message = "El teléfono no es válido")
     private String phone;
     @NotNull(message = "El salario es obligatorio")
-    @Min(value = 100000, message = "El salario debe ser al menos $100,000")
-    @Max(value = 5000000, message = "El salario debe ser menor o igual a $5,000,000")
+    @Min(value = 0, message = "El salario debe ser mayor a 0")
+    @Max(value = 15000000, message = "El salario debe ser menor o igual a $15.000.000")
     private Double salary;
     @JsonProperty("role_id")
     private Long roleId;

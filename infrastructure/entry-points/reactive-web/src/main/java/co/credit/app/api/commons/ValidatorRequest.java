@@ -1,11 +1,12 @@
 package co.credit.app.api.commons;
 
-import java.util.Set;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BeanPropertyBindingResult;
 
+import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import reactor.core.publisher.Mono;
 
@@ -23,10 +24,11 @@ public class ValidatorRequest {
             var errors = new BeanPropertyBindingResult(dto, dto.getClass().getName());
             var issuesList = validator.validate(dto);
             if (!issuesList.isEmpty()) {
-                Set<String> mensajesDeError = errors.getFieldErrors().stream()
-                        .map(error -> error.getDefaultMessage())
-                        .collect(Collectors.toSet());
-                throw new ValidationError("Error Validation", mensajesDeError);
+                List<String> messages = issuesList.stream()
+                        .map(ConstraintViolation::getMessage)
+                        .collect(Collectors.toList());
+
+                throw new ValidationError("Error Validation", messages);
             }
             return dto;
         });

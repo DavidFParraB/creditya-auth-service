@@ -1,19 +1,17 @@
 package co.credit.app.api.commons;
 
-import java.util.Set;
+import java.util.List;
 
-public class ValidationError extends RuntimeException implements ApplicationError {
+public class ValidationError extends RuntimeException {
 
-    private final Set<String> fields;
+    private final List<String> errors;
 
-    public ValidationError(String message, Set<String> fields) {
+    public ValidationError(String message, List<String> errors) {
         super(message);
-        this.fields = fields;
+        this.errors = errors;
     }
 
-    @Override
-    public Set<String> getFields() {
-        return fields;
+    public List<String> getErrors() {
+        return errors;
     }
-
 }

@@ -1,6 +1,5 @@
 package co.credit.app.r2dbc.entity;
 
-
 import org.springframework.data.relational.core.mapping.Table;
 
 import jakarta.persistence.Column;
@@ -25,7 +24,7 @@ public class UserEntity {
     private String lastName;
     @Column(name = "email", unique = true, nullable = false)
     private String email;
-    @Column(name = "email", unique = true, nullable = false)
+    @Column(name = "document", unique = true, nullable = false)
     private String document;
     private String phone;
     private Double salary;

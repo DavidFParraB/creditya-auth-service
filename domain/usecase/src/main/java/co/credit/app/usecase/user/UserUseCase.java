@@ -12,6 +12,7 @@ public class UserUseCase {
     private final UserRepository userRepository;
 
     public Mono<User> saveUser(User user) {
+
         return this.getUserByEmail(user.getEmail())
                 .flatMap(existingUser -> Mono.<User>error(new IllegalArgumentException(
                         "User with email: " + existingUser.getEmail() + " already exists.")) // Especifica el tipo aquí

@@ -8,10 +8,12 @@ import co.credit.app.model.user.User;
 import co.credit.app.model.user.gateways.UserRepository;
 import co.credit.app.r2dbc.entity.UserEntity;
 import co.credit.app.r2dbc.helper.ReactiveAdapterOperations;
+import lombok.extern.log4j.Log4j2;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Repository
+@Log4j2
 public class MyReactiveRepositoryAdapter
     extends ReactiveAdapterOperations<User, UserEntity, Long, MyReactiveRepository>
     implements UserRepository {
@@ -48,12 +50,16 @@ public class MyReactiveRepositoryAdapter
 
   @Override
   public Mono<User> findByDocument(String document) {
-    return repository.findByDocument(document).map(this::toEntity);
+    return repository.findByDocument(document)
+        .doOnSubscribe(s -> log.info("Searching for user by document: {}", document))
+        .map(this::toEntity);
   }
 
   @Override
   public Mono<User> findByEmail(String email) {
-    return repository.findByEmail(email).map(this::toEntity);
+    return repository.findByEmail(email)
+        .doOnSubscribe(s -> log.info("Searching for user by email: {}", email))
+        .map(this::toEntity);
   }
 
   @Override

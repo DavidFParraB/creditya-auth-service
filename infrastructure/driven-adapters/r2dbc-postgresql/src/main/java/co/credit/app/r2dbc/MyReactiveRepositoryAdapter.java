@@ -62,12 +62,10 @@ public class MyReactiveRepositoryAdapter
   }
 
   @Override
-  public Mono<Void> saveUser(User user) {
+  public Mono<User> saveUser(User user) {
     return repository.save(toData(user))
         .flatMap(savedUser -> {
           return Mono.just(savedUser);
-        })
-        .as(transactionalOperator::transactional)
-        .then();
+        }).as(transactionalOperator::transactional).map(this::toEntity);
   }
 }

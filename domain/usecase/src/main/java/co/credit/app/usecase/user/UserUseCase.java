@@ -1,3 +1,4 @@
+
 package co.credit.app.usecase.user;
 
 import co.credit.app.model.user.User;
@@ -10,8 +11,12 @@ import reactor.core.publisher.Mono;
 public class UserUseCase {
     private final UserRepository userRepository;
 
-    public Mono<Void> saveUser(User user) {
-        return userRepository.saveUser(user).then();
+    public Mono<User> saveUser(User user) {
+        return this.getUserByEmail(user.getEmail())
+                .flatMap(existingUser -> Mono.<User>error(new IllegalArgumentException(
+                        "User with email: " + existingUser.getEmail() + " already exists.")) // Especifica el tipo aquí
+                )
+                .switchIfEmpty(Mono.defer(() -> userRepository.saveUser(user)));
     }
 
     public Flux<User> getAllUsers() {

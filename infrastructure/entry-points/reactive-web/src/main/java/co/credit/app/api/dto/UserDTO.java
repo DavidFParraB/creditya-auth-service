@@ -15,5 +15,5 @@ public class UserDTO {
     private String phone;
     private Double salary;
     @JsonProperty( "role_id")
-    private Long roleId;   
+    private Long roleId;
 }

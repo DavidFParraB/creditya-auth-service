@@ -24,7 +24,6 @@ public class Handler {
         private final UserUseCase userUseCase;
         private final UserDTOMapper userDTOMapper;
         private final ValidatorRequest validatorRequest;
-        // private final jakarta.validation.Validator validator;
 
         public Mono<ServerResponse> listenGETUseCase(ServerRequest serverRequest) {
                 return userUseCase.getAllUsers()

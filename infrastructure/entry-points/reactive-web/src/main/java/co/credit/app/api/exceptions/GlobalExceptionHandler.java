@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.server.ResponseStatusException;
 
 import co.credit.app.api.dto.ErrorResponse;
 import lombok.extern.log4j.Log4j2;
@@ -40,4 +41,13 @@ public class GlobalExceptionHandler {
         ErrorResponse errorResponse = new ErrorResponse(friendlyMessage, null);
         return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse));
     }
+
+    @ExceptionHandler(ResponseStatusException.class)
+    public Mono<ResponseEntity<ErrorResponse>> handleValidationError(ResponseStatusException ex) {
+        log.error("Validation error occurred: {}", ex.getMessage(), ex);
+
+        ErrorResponse errorResponse = new ErrorResponse(ex.getMessage(), null);
+        return Mono.just(ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse));
+    }
+
 }

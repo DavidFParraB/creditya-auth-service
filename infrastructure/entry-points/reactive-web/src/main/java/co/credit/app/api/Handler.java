@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import org.springframework.web.server.ResponseStatusException;
 
 import co.credit.app.api.commons.ValidationError;
 import co.credit.app.api.commons.ValidatorRequest;
@@ -44,4 +45,23 @@ public class Handler {
                                 .doOnNext(user -> log.info("User saved: {}", user));
         }
 
+        public Mono<ServerResponse> listenGETByDocumentUseCase(ServerRequest serverRequest) {
+                String document = serverRequest.pathVariable("document");
+
+                return userUseCase.getUserByDocument(document)
+                                .map(userDTOMapper::toResponse)
+                                .flatMap(userDto -> ServerResponse.ok().bodyValue(userDto))
+                                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND,
+                                                "User not found with param: " + document)));
+        }
+
+        public Mono<ServerResponse> listenGETByEmailUseCase(ServerRequest serverRequest) {
+                String email = serverRequest.pathVariable("email");
+
+                return userUseCase.getUserByEmail(email)
+                                .map(userDTOMapper::toResponse)
+                                .flatMap(userDto -> ServerResponse.ok().bodyValue(userDto))
+                                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND,
+                                                "User not found with param: " + email)));
+        }
 }

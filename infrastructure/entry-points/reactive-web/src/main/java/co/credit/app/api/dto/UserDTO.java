@@ -1,6 +1,5 @@
 package co.credit.app.api.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.validation.constraints.Email;
@@ -14,7 +13,6 @@ import lombok.Data;
 
 @Data
 public class UserDTO {
-    @JsonIgnore
     private Long id;
     @NotBlank(message = "El nombre es obligatorio")
     private String name;

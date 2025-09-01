@@ -24,7 +24,7 @@ cors:
   allowed-origins: "http://localhost:4200,http://localhost:8080"
 
 r2dbc:
-  host: 127.0.0.1
+  host: ${IP_MAQUINA}
   port: 3306
   database: CrediYaDB
   username: fyroot

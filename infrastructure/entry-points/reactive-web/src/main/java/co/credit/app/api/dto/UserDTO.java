@@ -37,4 +37,5 @@ public class UserDTO {
     private Double salary;
     @JsonProperty("role_id")
     private Long roleId;
+    private String password;
 }

@@ -11,7 +11,6 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder(toBuilder = true)
 public class User {
-
     private Long id;
     private String name;
     private String lastName;
@@ -20,4 +19,5 @@ public class User {
     private String phone;
     private Double salary;
     private Long roleId;
+    private String password;
 }

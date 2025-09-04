@@ -23,6 +23,9 @@ management:
 cors:
   allowed-origins: "http://localhost:4200,http://localhost:8080"
 
+jwt:
+  secretKey: 12345678901234567890-12345678901234567890
+  expirationTime: 3600000
 r2dbc:
   host: 127.0.0.1
   port: 3306

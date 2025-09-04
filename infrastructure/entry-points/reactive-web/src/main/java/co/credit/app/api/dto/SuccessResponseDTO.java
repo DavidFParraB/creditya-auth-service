@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class SuccessResponse {
+public class SuccessResponseDTO {
     Integer code;
     String message;
 }

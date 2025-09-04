@@ -1,7 +1,12 @@
 package co.credit.app.api.config;
 
+import co.credit.app.api.mapper.AuthRequestDTOMapper;
+import co.credit.app.api.mapper.AuthResponseDTOMapper;
+import co.credit.app.usecase.auth.AuthUseCase;
 import org.junit.jupiter.api.Test;
 import static org.mockito.Mockito.when;
+
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -32,6 +37,15 @@ class ConfigTest {
 
         @MockBean
         private ValidatorRequest validatorErrorValidator;
+
+        @MockBean
+        private AuthUseCase authUseCase;
+
+        @MockBean
+        private AuthRequestDTOMapper authRequestDTOMapper;
+
+        @MockBean
+        private AuthResponseDTOMapper authResponseDTOMapper;
 
         @Test
         void corsConfigurationShouldAllowOrigins() {

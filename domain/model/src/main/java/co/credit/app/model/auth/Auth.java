@@ -15,6 +15,7 @@ public class Auth {
 
   private String username;
   private String password;
+  private Long role;
   private String token;
   private Long expirationTime;
 }

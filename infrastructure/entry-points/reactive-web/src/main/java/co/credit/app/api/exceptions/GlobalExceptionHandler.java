@@ -38,8 +38,7 @@ public class GlobalExceptionHandler {
     public Mono<ResponseEntity<ErrorResponseDTO>> handleGeneralException(IllegalArgumentException ex) {
         log.error("An unexpected error occurred: {}", ex.getMessage(), ex);
 
-        String friendlyMessage = "The email or document you are trying to register is already registered";
-        ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO(friendlyMessage, null);
+        ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO(ex.getMessage(), null);
         return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
             errorResponseDTO));
     }

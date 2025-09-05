@@ -1,7 +1,7 @@
 package co.credit.app.jwtprovider;
 
 import java.util.Date;
-import co.credit.app.jwtprovider.config.JwtConfig;
+import co.credit.app.jwtprovider.config.JwtConfigProvider;
 import co.credit.app.model.auth.Auth;
 import co.credit.app.model.auth.gateways.AuthRepository;
 import io.jsonwebtoken.Claims;
@@ -15,7 +15,7 @@ import reactor.core.publisher.Mono;
 @Component
 public class JwtProviderAdapter implements AuthRepository {
 
-  private final JwtConfig jwtConfig;
+  private final JwtConfigProvider jwtConfig;
 
   @Override
   public Mono<Auth> generateToken(Auth auth, Long roleId) {
@@ -34,16 +34,27 @@ public class JwtProviderAdapter implements AuthRepository {
   }
 
   @Override
-  public Mono<Boolean> validateToken(String token) {
+  public Mono<Auth> validateToken(String token) {
     try {
-      /*Claims claims = Jwts.parser().setSigningKey(jwtConfig.jwtSecretKey()).build()
-          .parseClaimsJws(token).getBody();*/
       Claims claims = Jwts.parser().verifyWith(jwtConfig.jwtSecretKey()).build()
           .parseSignedClaims(token).getPayload();
-      log.info("Token validated: {}", claims);
-      return Mono.just(true);
+      /*Claims claims = Jwts.parser()
+          .setSigningKey(jwtConfig.jwtSecretKey())
+          .build()
+          .parseClaimsJws(token)
+          .getBody();*/
+
+      log.info("Claims: {}", claims);
+      Auth auth = Auth.builder().username(claims.get("subject", String.class))
+          .expirationTime(claims.getExpiration().getTime())
+          .role(claims.get("role", Long.class))
+          .build();
+
+      return Mono.just(auth);
     } catch (Exception e) {
-      return Mono.just(false);
+      log.error("Invalid token: {}", e.getMessage(), e);
+      return Mono.error(new IllegalArgumentException("Invalid token"));
     }
   }
+
 }

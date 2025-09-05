@@ -6,6 +6,7 @@ import co.credit.app.api.mapper.AuthRequestDTOMapper;
 import co.credit.app.api.mapper.AuthResponseDTOMapper;
 import co.credit.app.usecase.auth.AuthUseCase;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
@@ -43,15 +44,48 @@ public class Handler {
         .onErrorResume(e -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
   }
 
+  /*public Mono<ServerResponse> listenPOSTUseCase(ServerRequest serverRequest) {
+    return ReactiveSecurityContextHolder.getContext()
+        .map(securityContext -> securityContext.getAuthentication().getPrincipal())
+        .flatMap(principal -> {
+          return serverRequest.bodyToMono(UserDTO.class)
+              .flatMap(validatorRequest::validate)
+              .flatMap(userDTO -> userUseCase.saveUser(userDTOMapper.toModel(userDTO))
+                  .then(ServerResponse.status(HttpStatus.OK)
+                      .bodyValue(new SuccessResponseDTO(0, "OK"))))
+              .onErrorResume(ValidationError.class, e -> ServerResponse.badRequest()
+                  .bodyValue(new ErrorResponseDTO(e.getMessage(), e.getErrors())))
+              .doOnNext(user -> log.info("User saved: {}", user));
+        });
+  }*/
+
   public Mono<ServerResponse> listenPOSTUseCase(ServerRequest serverRequest) {
-    return serverRequest.bodyToMono(UserDTO.class)
-        .flatMap(validatorRequest::validate)
-        .flatMap(userDTO -> userUseCase.saveUser(userDTOMapper.toModel(userDTO))
-            .then(ServerResponse.status(HttpStatus.OK)
-                .bodyValue(new SuccessResponseDTO(0, "OK"))))
-        .onErrorResume(ValidationError.class, e -> ServerResponse.badRequest()
-            .bodyValue(new ErrorResponseDTO(e.getMessage(), e.getErrors())))
-        .doOnNext(user -> log.info("User saved: {}", user));
+    return ReactiveSecurityContextHolder.getContext()
+        .map(securityContext -> {
+          log.info("Security context obtained: {}", securityContext);
+          return securityContext.getAuthentication().getPrincipal();
+        })
+        .flatMap(principal -> {
+          log.info("Principal obtained: {}", principal);
+          return serverRequest.bodyToMono(UserDTO.class)
+              .flatMap(validatorRequest::validate)
+              .flatMap(userDTO -> {
+                log.info("UserDTO validated: {}", userDTO);
+                return userUseCase.saveUser(userDTOMapper.toModel(userDTO))
+                    .then(ServerResponse.status(HttpStatus.OK)
+                        .bodyValue(new SuccessResponseDTO(0, "OK")));
+              })
+              .onErrorResume(ValidationError.class, e -> {
+                log.error("Validation error: {}", e.getMessage());
+                return ServerResponse.badRequest()
+                    .bodyValue(new ErrorResponseDTO(e.getMessage(), e.getErrors()));
+              })
+              .doOnNext(user -> log.info("User saved: {}", user));
+        })
+        .onErrorResume(e -> {
+          log.error("Error in processing request: {}", e.getMessage());
+          return ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        });
   }
 
   public Mono<ServerResponse> listenGETByDocumentUseCase(ServerRequest serverRequest) {
@@ -76,11 +110,14 @@ public class Handler {
 
   public Mono<ServerResponse> listenPOSTLogin(ServerRequest serverRequest) {
     return serverRequest.bodyToMono(AuthRequestDTO.class)
+        .flatMap(validatorRequest::validate)
         .flatMap(authREquestDTO -> authUseCase.authenticateUser(
             authRequestDTOMapper.toModel(authREquestDTO)))
         .flatMap(
             jwtToken -> ServerResponse.ok().bodyValue(authResponseDTOMapper.toResponse(jwtToken)))
         .switchIfEmpty(Mono.error(
-            new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials")));
+            new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials")))
+        .onErrorResume(ValidationError.class, e -> ServerResponse.badRequest()
+            .bodyValue(new ErrorResponseDTO(e.getMessage(), e.getErrors())));
   }
 }

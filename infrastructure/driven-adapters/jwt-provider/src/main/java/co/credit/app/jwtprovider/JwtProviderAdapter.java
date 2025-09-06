@@ -38,11 +38,6 @@ public class JwtProviderAdapter implements AuthRepository {
     try {
       Claims claims = Jwts.parser().verifyWith(jwtConfig.jwtSecretKey()).build()
           .parseSignedClaims(token).getPayload();
-      /*Claims claims = Jwts.parser()
-          .setSigningKey(jwtConfig.jwtSecretKey())
-          .build()
-          .parseClaimsJws(token)
-          .getBody();*/
 
       log.info("Claims: {}", claims);
       Auth auth = Auth.builder().username(claims.get("subject", String.class))

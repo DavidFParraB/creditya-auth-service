@@ -11,16 +11,15 @@ import javax.crypto.SecretKey;
 @RequiredArgsConstructor
 public class JwtConfigProvider {
 
-    private final JwtConfigProperties jwtConfigProperties;
+  private final JwtConfigProperties jwtConfigProperties;
 
-    @Bean
-    public SecretKey jwtSecretKey() {
-        // Use Keys.secretKeyFor() to generate a secure SecretKey for HS256
-        return Keys.hmacShaKeyFor(jwtConfigProperties.secretKey().getBytes());
-    }
+  @Bean
+  public SecretKey jwtSecretKey() {
+    return Keys.hmacShaKeyFor(jwtConfigProperties.secretKey().getBytes());
+  }
 
-    @Bean
-    public long jwtExpirationTime() {
-        return jwtConfigProperties.expirationTime();
-    }
+  @Bean
+  public long jwtExpirationTime() {
+    return jwtConfigProperties.expirationTime();
+  }
 }

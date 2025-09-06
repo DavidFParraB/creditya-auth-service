@@ -25,7 +25,7 @@ cors:
 
 jwt:
   secretKey: 12345678901234567890-12345678901234567890
-  expirationTime: 3600000
+  expirationTime: 300
 r2dbc:
   host: 127.0.0.1
   port: 3306

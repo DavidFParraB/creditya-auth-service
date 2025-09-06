@@ -29,3 +29,7 @@ r2dbc:
   database: CrediYaDB
   username: fyroot
   password: 1234
+
+jwt:
+  secretKey: 12345678901234567890-12345678901234567890
+  expirationTime: 300

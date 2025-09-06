@@ -1,7 +1,8 @@
-package co.credit.app.jwtprovider;
+package co.credit.app.api.config.filter;
 
-import io.jsonwebtoken.JwtException;
+import co.credit.app.usecase.auth.AuthUseCase;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -14,39 +15,20 @@ import reactor.core.publisher.Mono;
 
 @Component
 @Log4j2
-public class JwtAuthorizationFilter implements WebFilter {
+@RequiredArgsConstructor
+public class AuthorizationFilter implements WebFilter {
 
-  private final JwtProviderAdapter jwtService;
-
-  public JwtAuthorizationFilter(JwtProviderAdapter jwtService) {
-    this.jwtService = jwtService;
-  }
+  private final AuthUseCase authUseCase;
 
   @Override
   public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
     String authHeader = exchange.getRequest().getHeaders().getFirst("Authorization");
 
-    /*if (authHeader != null && authHeader.startsWith("Bearer ")) {
-      String token = authHeader.substring(7);
-
-      return Mono.just(jwtService.validateToken(token))
-          .onErrorResume(e -> Mono.empty())
-          .flatMap(authResult -> {
-            String username = authResult.getUsername();
-            String role =authResult.getRole().toString();
-
-            var auth = new UsernamePasswordAuthenticationToken(username, null,
-                List.of(new SimpleGrantedAuthority("ROLE_" + role)));
-            return chain.filter(exchange)
-                .contextWrite(ReactiveSecurityContextHolder.withAuthentication(auth));
-          });
-    }
-    return chain.filter(exchange);*/
     if (authHeader != null && authHeader.startsWith("Bearer ")) {
       log.info("Authorization header: {}", authHeader);
       String token = authHeader.substring(7);
 
-      return jwtService.validateToken(token)
+      return authUseCase.validateToken(token)
           .flatMap(authResult -> {
             String username = authResult.getUsername();
             String role = authResult.getRole().toString();

@@ -21,6 +21,10 @@ public class AuthUseCase {
         return Mono.error(new IllegalArgumentException("Invalid email or password"));
       }
     });
+  }
 
+  public Mono<Auth> validateToken(String token) {
+    return authService.validateToken(token)
+        .switchIfEmpty(Mono.error(new IllegalArgumentException("Invalid token")));
   }
 }

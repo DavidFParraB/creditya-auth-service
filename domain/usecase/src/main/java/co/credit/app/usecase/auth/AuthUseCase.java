@@ -11,6 +11,8 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class AuthUseCase {
 
+  private static final int MAX_ATTEMPTS = 5;
+
   private final AuthRepository authService;
   private final UserRepository userRepository;
   private final AttemptsRepository attemptsRepository;
@@ -24,6 +26,9 @@ public class AuthUseCase {
         return attemptsRepository.getAttemptsBySession(auth.getUsername())
             .flatMap(existingAttempts -> {
               int newAttempts = existingAttempts.getNroAttempts() + 1;
+              if (newAttempts > MAX_ATTEMPTS) {
+                return Mono.error(new IllegalArgumentException("Maximum attempts exceeded"));
+              }
               return Mono.just(newAttempts);
             })
             .switchIfEmpty(Mono.just(1))

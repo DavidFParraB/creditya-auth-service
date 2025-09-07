@@ -1,5 +1,7 @@
 package co.credit.app.usecase.auth;
 
+import co.credit.app.model.attempts.Attempts;
+import co.credit.app.model.attempts.gateways.AttemptsRepository;
 import co.credit.app.model.auth.Auth;
 import co.credit.app.model.auth.gateways.AuthRepository;
 import co.credit.app.model.user.gateways.UserRepository;
@@ -11,6 +13,7 @@ public class AuthUseCase {
 
   private final AuthRepository authService;
   private final UserRepository userRepository;
+  private final AttemptsRepository attemptsRepository;
 
   public Mono<Auth> authenticateUser(Auth auth) {
 
@@ -18,7 +21,17 @@ public class AuthUseCase {
       if (user.getPassword().equals(auth.getPassword())) {
         return authService.generateToken(auth, user.getRoleId());
       } else {
-        return Mono.error(new IllegalArgumentException("Invalid email or password"));
+        return attemptsRepository.getAttemptsBySession(auth.getUsername())
+            .flatMap(existingAttempts -> {
+              int newAttempts = existingAttempts.getNroAttempts() + 1;
+              return Mono.just(newAttempts);
+            })
+            .switchIfEmpty(Mono.just(1))
+            .flatMap(newAttempts -> {
+              Attempts newAttempt = Attempts.builder().nroAttempts(newAttempts).build();
+              return attemptsRepository.saveAttempts(auth.getUsername(), newAttempt)
+                  .then(Mono.error(new IllegalArgumentException("Invalid email or password")));
+            });
       }
     });
   }

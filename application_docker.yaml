@@ -11,6 +11,9 @@ spring:
       path: "/h2"
   profiles:
     include: null
+  redis:
+    host: "${REDIS_IP}"
+    port: "${REDIS_PORT}"
 management:
   endpoints:
     web:
@@ -24,12 +27,18 @@ cors:
   allowed-origins: "http://localhost:4200,http://localhost:8080"
 
 r2dbc:
-  host: ${IP_MAQUINA}
-  port: 3306
-  database: CrediYaDB
-  username: fyroot
-  password: 1234
-
+  host: "${MYSQL_IP}"
+  port: "${MYSQL_PORT}"
+  database: "${MYSQL_DB}"
+  username: "${MYSQL_USER}"
+  password: "${MYSQL_PASSWORD}"
 jwt:
-  secretKey: 12345678901234567890-12345678901234567890
+  secretKey: "${KEY_SECRET_AUTH_JWT}"
   expirationTime: 300
+
+aux:
+  redis:
+    attemptsKey: "creditya:auth:attempts_"
+    attemptsLimit: 5
+    attemptsExpirationTime: 30000
+

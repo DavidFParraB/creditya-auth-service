@@ -53,4 +53,11 @@ public class ReactiveRedisTemplateAdapter extends
         .doOnSubscribe(s -> log.info("Saving attempts for session: {}", email))
         .then();
   }
+
+  @Override
+  public Mono<Void> deleteAttempts(String email) {
+    return reactiveRedisTemplate.delete(configProperties.attemptsKey() + email)
+       .doOnSubscribe(s -> log.info("Deleting attempts for session: {}", email))
+       .then();
+  }
 }

@@ -30,5 +30,5 @@ public class UserEntity {
     private Double salary;
     @Column(name = "role_id")
     private Long roleId;
-    private Long password;
+    private String password;
 }

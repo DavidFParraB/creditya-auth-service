@@ -1,6 +1,7 @@
 
 package co.credit.app.usecase.user;
 
+import co.credit.app.model.auth.gateways.AuthRepository;
 import co.credit.app.model.user.User;
 import co.credit.app.model.user.gateways.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -9,35 +10,39 @@ import reactor.core.publisher.Mono;
 
 @RequiredArgsConstructor
 public class UserUseCase {
-    private final UserRepository userRepository;
 
-    public Mono<User> saveUser(User user) {
+  private final UserRepository userRepository;
+  private final AuthRepository authRepository;
 
-        return this.getUserByEmail(user.getEmail())
-                .flatMap(existingUser -> Mono.<User>error(new IllegalArgumentException(
-                        "User with email: " + existingUser.getEmail() + " already exists.")) // Especifica el tipo aquí
-                )
-                .switchIfEmpty(Mono.defer(() -> userRepository.saveUser(user)));
-    }
+  public Mono<User> saveUser(User user) {
 
-    public Flux<User> getAllUsers() {
-        return userRepository.getAllUsers();
-    }
+    user.setPassword(authRepository.encryptPassword(user.getPassword()));
 
-    public Mono<User> getUserByDocument(String document) {
-        return userRepository.findByDocument(document);
-    }
+    return this.getUserByEmail(user.getEmail())
+        .flatMap(existingUser -> Mono.<User>error(new IllegalArgumentException(
+                "User with email: " + existingUser.getEmail() + " already exists."))
+        )
+        .switchIfEmpty(Mono.defer(() -> userRepository.saveUser(user)));
+  }
 
-    public Mono<User> getUserByEmail(String email) {
-        return userRepository.findByEmail(email);
-    }
+  public Flux<User> getAllUsers() {
+    return userRepository.getAllUsers();
+  }
 
-    public Mono<Void> deleteUser(User user) {
-        return userRepository.deleteUser(user).then();
-    }
+  public Mono<User> getUserByDocument(String document) {
+    return userRepository.findByDocument(document);
+  }
 
-    public Mono<User> updateUser(User user) {
-        return userRepository.updateUser(user);
-    }
+  public Mono<User> getUserByEmail(String email) {
+    return userRepository.findByEmail(email);
+  }
+
+  public Mono<Void> deleteUser(User user) {
+    return userRepository.deleteUser(user).then();
+  }
+
+  public Mono<User> updateUser(User user) {
+    return userRepository.updateUser(user);
+  }
 
 }

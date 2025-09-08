@@ -57,13 +57,13 @@ public class JwtProviderAdapter implements AuthRepository {
   @Override
   public String encryptPassword(String password) {
     log.info("Encrypting password: {} - encrypt: {} ", password , passwordEncoder.encode(password));
-    return passwordEncoder.encode(password); // Replace with actual encryption logic
+    return passwordEncoder.encode(password);
   }
 
   @Override
   public Boolean validatePassword(String password, String encryptedPassword) {
     log.info("Validating password: {} - encrypted: {} - validate: {} ", password, encryptedPassword, passwordEncoder.matches(password, encryptedPassword));
-    return passwordEncoder.matches(password, encryptedPassword); // Replace with actual validation logic
+    return passwordEncoder.matches(password, encryptedPassword);
   }
 
 }

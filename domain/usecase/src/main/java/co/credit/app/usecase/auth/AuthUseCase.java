@@ -20,8 +20,6 @@ public class AuthUseCase {
   public Mono<Auth> authenticateUser(Auth auth) {
     return userRepository.findByEmail(auth.getUsername()).flatMap(user -> {
       if (authService.validatePassword(auth.getPassword(), user.getPassword())) {
-        /*attemptsRepository.deleteAttempts(auth.getUsername());
-        return authService.generateToken(auth, user.getRoleId());*/
         return attemptsRepository.deleteAttempts(auth.getUsername())
             .then(authService.generateToken(auth, user.getRoleId()));
       } else {

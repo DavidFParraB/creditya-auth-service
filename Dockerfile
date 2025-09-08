@@ -26,5 +26,5 @@ USER user
 
 
 ENV JAVA_TOOL_OPTIONS="-XX:MaxRAMPercentage=75 -XX:+ExitOnOutOfMemoryError"
-EXPOSE 8080
+EXPOSE 8079
 ENTRYPOINT ["java","-jar","/opt/app/app.jar","--spring.config.location=file:/opt/app/application_docker.yaml"]

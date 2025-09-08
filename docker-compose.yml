@@ -2,7 +2,7 @@ services:
 
   app-auth-service:
     build:
-      context: ./creditya-auth-service
+      context: ./
       dockerfile: deployment/Dockerfile
     ports:
       - "8079:8079"

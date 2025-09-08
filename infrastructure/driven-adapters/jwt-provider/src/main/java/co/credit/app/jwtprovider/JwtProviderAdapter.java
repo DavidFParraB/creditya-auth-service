@@ -8,6 +8,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 @Log4j2
@@ -16,6 +17,7 @@ import reactor.core.publisher.Mono;
 public class JwtProviderAdapter implements AuthRepository {
 
   private final JwtConfigProvider jwtConfig;
+  private final PasswordEncoder passwordEncoder;
 
   @Override
   public Mono<Auth> generateToken(Auth auth, Long roleId) {
@@ -50,6 +52,18 @@ public class JwtProviderAdapter implements AuthRepository {
       log.error("Invalid token: {}", e.getMessage(), e);
       return Mono.error(new IllegalArgumentException("Invalid token"));
     }
+  }
+
+  @Override
+  public String encryptPassword(String password) {
+    log.info("Encrypting password: {} - encrypt: {} ", password , passwordEncoder.encode(password));
+    return passwordEncoder.encode(password);
+  }
+
+  @Override
+  public Boolean validatePassword(String password, String encryptedPassword) {
+    log.info("Validating password: {} - encrypted: {} - validate: {} ", password, encryptedPassword, passwordEncoder.matches(password, encryptedPassword));
+    return passwordEncoder.matches(password, encryptedPassword);
   }
 
 }

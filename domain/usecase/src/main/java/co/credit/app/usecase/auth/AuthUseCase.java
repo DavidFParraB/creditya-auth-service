@@ -18,10 +18,10 @@ public class AuthUseCase {
   private final AttemptsRepository attemptsRepository;
 
   public Mono<Auth> authenticateUser(Auth auth) {
-
     return userRepository.findByEmail(auth.getUsername()).flatMap(user -> {
-      if (user.getPassword().equals(auth.getPassword())) {
-        return authService.generateToken(auth, user.getRoleId());
+      if (authService.validatePassword(auth.getPassword(), user.getPassword())) {
+        return attemptsRepository.deleteAttempts(auth.getUsername())
+            .then(authService.generateToken(auth, user.getRoleId()));
       } else {
         return attemptsRepository.getAttemptsBySession(auth.getUsername())
             .flatMap(existingAttempts -> {

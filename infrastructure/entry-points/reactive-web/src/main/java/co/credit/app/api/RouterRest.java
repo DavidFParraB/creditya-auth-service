@@ -1,6 +1,9 @@
 
 package co.credit.app.api;
 
+import co.credit.app.api.dto.AuthRequestDTO;
+import co.credit.app.api.dto.AuthResponseDTO;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springdoc.core.annotations.RouterOperation;
 import org.springdoc.core.annotations.RouterOperations;
 import org.springframework.context.annotation.Bean;
@@ -39,7 +42,7 @@ public class RouterRest {
       })),
       @RouterOperation(path = "/api/user", produces = {
           MediaType.APPLICATION_JSON_VALUE}, method = org.springframework.web.bind.annotation.RequestMethod.POST, beanClass = Handler.class, beanMethod = "listenPOSTUseCase", operation = @Operation(operationId = "createUser", tags = {
-          "Users"}, summary = "Create a new user", description = "Create a new user with the provided details", requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "User details", required = true, content = @Content(schema = @Schema(implementation = UserDTO.class))), responses = {
+          "Users"}, summary = "Create a new user", description = "Create a new user with the provided details", security = @SecurityRequirement(name = "BearerAuth"), requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "User details", required = true, content = @Content(schema = @Schema(implementation = UserDTO.class))), responses = {
           @ApiResponse(responseCode = "200", description = "User created", content = @Content(schema = @Schema(implementation = SuccessResponseDTO.class))),
           @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(schema = @Schema(implementation = ErrorResponseDTO.class))),
           @ApiResponse(responseCode = "500", description = "Internal server error")
@@ -61,7 +64,16 @@ public class RouterRest {
           @ApiResponse(responseCode = "200", description = "User found", content = @Content(schema = @Schema(implementation = UserDTO.class))),
           @ApiResponse(responseCode = "404", description = "User not found"),
           @ApiResponse(responseCode = "500", description = "Internal server error")
+      })),
+      @RouterOperation(path = "/api/login", produces = {
+          MediaType.APPLICATION_JSON_VALUE}, method = org.springframework.web.bind.annotation.RequestMethod.POST, beanClass = Handler.class, beanMethod = "listenPOSTLogin", operation = @Operation(operationId = "loginUser", tags = {
+          "Authentication"}, summary = "Login user", description = "Authenticate a user with the provided credentials", requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "User credentials", required = true, content = @Content(schema = @Schema(implementation = AuthRequestDTO.class))), responses = {
+          @ApiResponse(responseCode = "200", description = "User authenticated", content = @Content(schema = @Schema(implementation = AuthResponseDTO.class))),
+          @ApiResponse(responseCode = "401", description = "Unauthorized"),
+          @ApiResponse(responseCode = "404", description = "User not found"),
+          @ApiResponse(responseCode = "500", description = "Internal server error")
       }))
+
   })
   @Bean
   public RouterFunction<ServerResponse> routerFunction(Handler handler) {

@@ -37,5 +37,6 @@ public class UserDTO {
     private Double salary;
     @JsonProperty("role_id")
     private Long roleId;
+    @NotBlank(message = "El password es obligatorio")
     private String password;
 }

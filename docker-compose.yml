@@ -13,8 +13,9 @@ services:
       MYSQL_USER: fyroot
       MYSQL_PASSWORD: 1234
       REDIS_IP: 192.168.20.46
-      REDIS_PORT: 3306
+      REDIS_PORT: 6379
       KEY_SECRET_AUTH_JWT: 12345678901234567890-12345678901234567890
+
     networks:
       - crediya_network
   

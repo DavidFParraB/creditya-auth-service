@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 8079
 spring:
   application:
     name: "creditya-auth-service"
@@ -14,6 +14,11 @@ spring:
   redis:
     host: "${REDIS_IP}"
     port: "${REDIS_PORT}"
+  data:
+    redis:
+      host: "${REDIS_IP}"
+      port: "${REDIS_PORT}"
+      database: 0
 management:
   endpoints:
     web:

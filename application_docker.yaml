@@ -19,6 +19,9 @@ spring:
       host: "${REDIS_IP}"
       port: "${REDIS_PORT}"
       database: 0
+      password: "${REDIS_PWD}"
+      ssl:
+        enabled: "${REDIS_SSL_ENABLED}"
 management:
   endpoints:
     web:

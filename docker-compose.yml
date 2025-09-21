@@ -7,13 +7,14 @@ services:
     ports:
       - "8079:8079"
     environment:
-      MYSQL_IP: 192.168.20.46
+      MYSQL_IP: db-creditya-users.chqseagew09w.us-east-2.rds.amazonaws.com
       MYSQL_PORT: 3306
-      MYSQL_DB: CrediYaDB
-      MYSQL_USER: fyroot
-      MYSQL_PASSWORD: 1234
+      MYSQL_DB: db-creditya-users
+      MYSQL_USER: auth
+      MYSQL_PASSWORD: users4dm1nawsdavid.2025
       REDIS_IP: 192.168.20.46
       REDIS_PORT: 6379
+
       KEY_SECRET_AUTH_JWT: 12345678901234567890-12345678901234567890
 
     networks:

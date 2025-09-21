@@ -1,6 +1,7 @@
 package co.credit.app.r2dbc.config;
 
 import java.time.Duration;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import io.asyncer.r2dbc.mysql.MySqlConnectionConfiguration;
@@ -9,6 +10,7 @@ import io.r2dbc.pool.ConnectionPool;
 import io.r2dbc.pool.ConnectionPoolConfiguration;
 
 @Configuration
+@Log4j2
 public class MySQLConnectionPool {
 
   public static final int INITIAL_SIZE = 12;
@@ -22,12 +24,8 @@ public class MySQLConnectionPool {
         .host(properties.host()).port(properties.port() != null ? properties.port() : DEFAULT_PORT)
         .database(properties.database()).username(properties.username())
         .password(properties.password());
-
-    /*
-     * if (properties.timezone() != null && !properties.timezone().isBlank()) { builder =
-     * builder.serverZoneId(properties.timezone()); }
-     */
-
+    log.info("Initializing MySQL connection pool with properties: {}", properties);
+    log.info("user: {} - pwd: {}", properties.username(), properties.password());
     MySqlConnectionConfiguration configuration = builder.build();
 
     ConnectionPoolConfiguration poolConfiguration = ConnectionPoolConfiguration.builder()
